@@ -8,35 +8,41 @@ local_host = '0.0.0.0'
 local_port = 12345
 
 
+import struct
 
-# mysql_host = 'localhost'
-# mysql_user = 'root'
-# mysql_password = 'welcome1'
-# mysql_database = 'fmc650_data'
+def parse_avl_packet(data):
+    # Skip first 4 bytes
+    avl_length = int.from_bytes(data[4:8], byteorder='big')
+    codec_id = data[8]
+    record_count = data[9]
+    
+    print(f"📦 AVL length: {avl_length}")
+    print(f"🧬 Codec ID: {codec_id}")
+    print(f"📄 Number of Records: {record_count}")
+    
+    offset = 10
+    for i in range(record_count):
+        timestamp = int.from_bytes(data[offset:offset+8], byteorder='big')
+        priority = data[offset+8]
+        lon = struct.unpack('>i', data[offset+9:offset+13])[0] / 10000000
+        lat = struct.unpack('>i', data[offset+13:offset+17])[0] / 10000000
+        alt = struct.unpack('>h', data[offset+17:offset+19])[0]
+        angle = struct.unpack('>h', data[offset+19:offset+21])[0]
+        satellites = data[offset+21]
+        speed = struct.unpack('>H', data[offset+22:offset+24])[0]
+
+        print(f"\n🔸 Record #{i+1}:")
+        print(f"🕒 Timestamp: {timestamp}")
+        print(f"📍 Position: ({lat}, {lon})")
+        print(f"📶 Satellites: {satellites}")
+        print(f"🛣️ Speed: {speed} km/h")
+        print(f"📐 Angle: {angle}° | Altitude: {alt} m")
+
+        # Advance offset to skip the rest (we ignore IO for now)
+        offset += 60  # approx. for demo – you can parse IO elements properly after
 
 
-# def insert_data_to_mysql(data):
-#     try:
-        
-#         connection = mysql.connector.connect(
-#             host=mysql_host,
-#             user=mysql_user,
-#             password=mysql_password,
-#             database=mysql_database
-#         )
-        
-#         if connection.is_connected():
-#             cursor = connection.cursor()
-#             query = "INSERT INTO can_data (data) VALUES (%s)"
-#             cursor.execute(query, (data,))
-#             connection.commit()
-#             print(f"Data inserted into database: {data}")
-#     except Error as e:
-#         print(f"Error inserting data into MySQL: {e}")
-#     finally:
-#         if connection.is_connected():
-#             cursor.close()
-#             connection.close()
+
 
 
 def handle_client(client_socket):
@@ -64,6 +70,7 @@ def handle_client(client_socket):
                 print("Client disconnected après IMEI.")
                 break
             print(f"AVL data reçue : {avl_data}")
+            parse_avl_packet(avl_data)
 
     except Exception as e:
         print(f"Erreur : {e}")

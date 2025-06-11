@@ -1,6 +1,6 @@
 import socket
-import mysql.connector
-from mysql.connector import Error
+# import mysql.connector
+# from mysql.connector import Error
 import threading
 
 

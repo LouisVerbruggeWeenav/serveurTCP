@@ -4,7 +4,7 @@ import socket
 import threading
 
 
-local_host = '127.0.0.1' 
+local_host = '0.0.0.0' 
 local_port = 12345
 
 

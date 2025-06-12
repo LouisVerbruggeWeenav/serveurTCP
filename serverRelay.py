@@ -106,6 +106,12 @@ def run_tcp_server(host='0.0.0.0', port=12345):
 
         avl_data_len = struct.unpack(">I", data[:4])[0]
         avl_payload = data[4:]  # exclure header TCP
+        if len(avl_payload) < avl_data_len:
+            print("❌ Données incomplètes, la taille réelle est inférieure à celle attendue.")
+            conn.close()
+            continue
+
+
         print(f"📐 Longueur AVL : {avl_data_len} octets")
         print(f"🧾 Données Codec 8 : {avl_payload.hex().upper()}")
 

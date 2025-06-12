@@ -1,143 +1,120 @@
 import socket
+# import mysql.connector
+# from mysql.connector import Error
+import threading
+
+
+local_host = '0.0.0.0' 
+local_port = 12345
+
+
 import struct
-from datetime import datetime
 
-def extract_io_elements(io_data, counts, offset=0):
-    io_dict = {}
-    index = offset
-    for size, count in counts.items():
-        for _ in range(count):
-            io_id = io_data[index]
-            value = io_data[index + 1 : index + 1 + size]
-            io_dict[io_id] = value
-            index += 1 + size
-    return io_dict
+def parse_avl_packet(data):
+    # Skip first 4 bytes
+    avl_length = int.from_bytes(data[4:8], byteorder='big')
+    codec_id = data[8]
+    record_count = data[9]
+    
+    print(f"📦 AVL length: {avl_length}")
+    print(f"🧬 Codec ID: {codec_id}")
+    print(f"📄 Number of Records: {record_count}")
+    
+    offset = 10
+    for i in range(record_count):
+        timestamp = int.from_bytes(data[offset:offset+8], byteorder='big')
+        priority = data[offset+8]
+        lon = struct.unpack('>i', data[offset+9:offset+13])[0] / 10000000
+        lat = struct.unpack('>i', data[offset+13:offset+17])[0] / 10000000
+        alt = struct.unpack('>h', data[offset+17:offset+19])[0]
+        angle = struct.unpack('>h', data[offset+19:offset+21])[0]
+        satellites = data[offset+21]
+        speed = struct.unpack('>H', data[offset+22:offset+24])[0]
+        # Lecture simple des éléments IO (pour démo, ne gère que le nombre d'IO 1-byte)
+        event_io_id = data[offset+24]
+        n_total_io = data[offset+25]
+        n_1b = data[offset+26]
+        io_1b = {}
+        idx = offset + 27
+        for _ in range(n_1b):
+            io_id = data[idx]
+            io_val = data[idx+1]
+            io_1b[io_id] = io_val
+            print(f"    IO 1-byte: id={io_id}, value={io_val}")
+            idx += 2
 
-def decode_avl_packet(payload):
-    codec_id = payload[0]
-    record_count = payload[1]
-    print(f"\n📦 Codec ID: {codec_id} | 📊 Records: {record_count}")
+        print(f"Event IO ID: {event_io_id}")
+        print(f"Total IO: {n_total_io}")
+        print(f"1-byte IO count: {n_1b}")
+        print(f"1-byte IO values: {io_1b}")
 
-    index = 2  # après Codec ID et record count
+        print(f"\nRecord #{i+1}:")
+        print(f"Timestamp: {timestamp}")
+        print(f"Position: ({lat}, {lon})")
+        print(f"Satellites: {satellites}")
+        print(f"Speed: {speed} km/h")
+        print(f"Angle: {angle}° | Altitude: {alt} m")
 
-    # --- pour simplifier, on traite un seul record (le 1er) ---
-    timestamp = struct.unpack(">Q", payload[index:index+8])[0]
-    dt = datetime.utcfromtimestamp(timestamp / 1000.0)
-    index += 8
 
-    priority = payload[index]
-    index += 1
+        # Advance offset to skip the rest (we ignore IO for now)
+        #offset += 60  # approx. for demo – you can parse IO elements properly after
 
-    lon = struct.unpack(">i", payload[index:index+4])[0] / 10_000_000
-    lat = struct.unpack(">i", payload[index+4:index+8])[0] / 10_000_000
-    index += 8
 
-    altitude = struct.unpack(">H", payload[index:index+2])[0]
-    angle = struct.unpack(">H", payload[index+2:index+4])[0]
-    satellites = payload[index+4]
-    speed = struct.unpack(">H", payload[index+5:index+7])[0]
-    index += 7
 
-    print(f"🕓 Timestamp: {dt}")
-    print(f"📍 GPS: {lat}, {lon} | 🚗 Speed: {speed} km/h | 🛰 Sats: {satellites}")
 
-    # IO elements
-    event_io_id = payload[index]
-    total_io_count = payload[index + 1]
-    index += 2
 
-    one_b = payload[index]
-    index += 1
-    one_b_data = payload[index:index + one_b * 2]
-    index += one_b * 2
+def handle_client(client_socket):
+    try:
+        data = client_socket.recv(4096)
+        if not data:
+            print("Client disconnected.")
+            return
 
-    two_b = payload[index]
-    index += 1
-    two_b_data = payload[index:index + two_b * 3]
-    index += two_b * 3
+        print(f"Données brutes : {data}")
 
-    four_b = payload[index]
-    index += 1
-    four_b_data = payload[index:index + four_b * 5]
-    index += four_b * 5
+        # Extraire la longueur de l’IMEI
+        imei_len = int.from_bytes(data[0:2], byteorder='big')
+        imei = data[2:2+imei_len].decode()
+        print(f"IMEI : {imei}")
 
-    eight_b = payload[index]
-    index += 1
-    eight_b_data = payload[index:index + eight_b * 9]
-    index += eight_b * 9
+        # Envoyer l’ACK requis
+        client_socket.send(b'\x01')
+        print("ACK envoyé au traceur")
 
-    io_data = {}
-    io_data.update(extract_io_elements(one_b_data, {1: one_b}))
-    io_data.update(extract_io_elements(two_b_data, {2: two_b}))
-    io_data.update(extract_io_elements(four_b_data, {4: four_b}))
-    io_data.update(extract_io_elements(eight_b_data, {8: eight_b}))
+        # Ensuite, il peut envoyer des paquets AVL (données GPS, etc.)
+        while True:
+            avl_data = client_socket.recv(4096)
+            if not avl_data:
+                print("Client disconnected après IMEI.")
+                break
+            print(f"AVL data reçue : {avl_data}")
+            parse_avl_packet(avl_data)
 
-    return dt, lat, lon, speed, io_data
+    except Exception as e:
+        print(f"Erreur : {e}")
+    finally:
+        client_socket.close()
 
-def run_tcp_server(host='0.0.0.0', port=12345):
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((host, port))
-    server.listen(1)
-    print(f"✅ Serveur TCP FMC650 en écoute sur {host}:{port}...")
+
+
+def start_tcp_server():
+    
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    server_socket.bind((local_host, local_port))
+    server_socket.listen(5)
+    print(f"Serveur TCP en écoute sur {local_host}:{local_port}...")
 
     while True:
-        conn, addr = server.accept()
-        print(f"\n📥 Connexion de {addr}")
+        client_socket, client_address = server_socket.accept()
+        print(f"Connexion acceptée de {client_address}")
 
-        # Lire IMEI
-        imei_data = conn.recv(1024)
-        if len(imei_data) < 2:
-            print("❌ Erreur : pas assez de données pour IMEI.")
-            conn.close()
-            continue
+        client_thread = threading.Thread(target=handle_client, args=(client_socket,))
+        client_thread.start()
 
-        imei_len = imei_data[1]
-        imei = imei_data[2:2 + imei_len].decode(errors='ignore')
-        print(f"📶 IMEI reçu : {imei}")
+if __name__ == '__main__':
+    #start_tcp_server()
 
-        conn.send(b'\x01')  # ACK
+    parse_avl_packet(b'\x00\x00\x00\x00\x00\x00\x03\xb4\x08\x10\x00\x00\x01\x97`\n\x1c\x97\x00\x01\xde\x8a@\x1e?\xa7\xa6\x000\x00\x00\x06\x00\x00\x00\x0c\x06\x16\x00G\x03\xf0\x00\x15\x00\xc8\x00\xef\x00\x06C\x1f\x1dD\x00\x00\xb5\x00\x12\xb6\x00\x0fB\x00\x00\x18\x00\x00\x00\x00\x00\x00\x01\x97`\x03qh\x00\x01\xde\x8a@\x1e?\xa7\xa6\x00-\x00\x00\x06\x00\x00\x00\x0c\x06\x16\x00G\x03\xf0\x00\x15\x00\xc8\x00\xef\x00\x06C\x1f\xfaD\x00\x00\xb5\x00\x10\xb6\x00\rB\x00\x00\x18\x00\x00\x00\x00\x00\x00\x01\x97_\xf7G\xdb\x00\x01\xde\x8a@\x1e?\xa7\xa6\x00+\x00\x00\x05\x00\x00\x00\x0c\x06\x16\x00G\x03\xf0\x00\x15\x00\xc8\x00\xef\x00\x06C \xafD\x00\x00\xb5\x00\x12\xb6\x00\x0fB\x00\x00\x18\x00\x00\x00\x00\x00\x00\x01\x97_\xf0\x98\xc4\x00\x01\xde\x8a@\x1e?\xa7\xa6\x00,\x00\x00\x05\x00\x00\x00\x0c\x06\x16\x00G\x03\xf0\x00\x15\x00\xc8\x00\xef\x00\x06C \xf7D\x00\x00\xb5\x00\x1b\xb6\x00\x19B\x00\x00\x18\x00\x00\x00\x00\x00\x00\x01\x97_\xe9\xe5\xc6\x00\x01\xde\x8a@\x1e?\xa7\xa6\x00+\x00\x00\x04\x00\x00\x00\x0c\x06\x16\x00G\x03\xf0\x00\x15\x00\xc8\x00\xef\x00\x06C!7D\x00\x00\xb5\x00 \xb6\x00\x1fB\x00\x00\x18\x00\x00\x00\x00\x00\x00\x01\x97_\xdd\xb4h\x00\x01\xde\x8a@\x1e?\xa7\xa6\x00\'\x00\x00\x06\x00\x00\x00\x0c\x06\x16\x00G\x03\xf0\x00\x15\x00\xc8\x00\xef\x00\x06C!\xa8D\x00\x00\xb5\x00\x10\xb6\x00\rB\x00\x00\x18\x00\x00\x00\x00\x00\x00\x01\x97_\xd6\xfd\x81\x00\x01\xde\x8a@\x1e?\xa7\xa6\x00%\x00\x00\x05\x00\x00\x00\x0c\x06\x16\x00G\x03\xf0\x00\x15\x00\xc8\x00\xef\x00\x06C!\xa1D\x00\x00\xb5\x00\x15\xb6\x00\x13B\x00\x00\x18\x00\x00\x00\x00\x00\x00\x01\x97_\xd0J\x83\x00\x01\xde\x8a@\x1e?\xa7\xa6\x00&\x00\x00\x05\x00\x00\x00\x0c\x06\x16\x00G\x03\xf0\x00\x15\x00\xc8\x00\xef\x00\x06C"\tD\x00\x00\xb5\x00\x17\xb6\x00\x15B\x00\x00\x18\x00\x00\x00\x00\x00\x00\x01\x97_\xc9\x97\x84\x00\x01\xde\x8a@\x1e?\xa7\xa6\x00&\x00\x00\x04\x00\x00\x00\x0c\x06\x16\x00G\x03\xf0\x00\x15\x00\xc8\x00\xef\x00\x06C"\x1eD\x00\x00\xb5\x00\x1a\xb6\x00\x18B\x00\x00\x18\x00\x00\x00\x00\x00\x00\x01\x97_\xc2\xe4\x86\x00\x01\xde\x8a@\x1e?\xa7\xa6\x00\x00\x00\x00\x00\x00\x00\x00\x0c\x06\x16\x00G\x02\xf0\x00\x15\x00\xc8\x00\xef\x00\x06C"@D\x00\x00\xb5\x00\x1e\xb6\x00\x1cB\x00\x00\x18\x00\x00\x00\x00\x00\x00\x01\x97_\xb6\xb3(\x00\x01\xde\x8a@\x1e?\xa7\xa6\x00\x00\x00\x00\x00\x00\x00\x00\x0c\x06\x16\x00G\x02\xf0\x00\x15\x00\xc8\x00\xef\x00\x06C"\x85D\x00\x00\xb5\x00!\xb6\x00 B\x00\x00\x18\x00\x00\x00\x00\x00\x00\x01\x97_\xaf\xfcB\x00\x01\xde\x8a@\x1e?\xa7\xa6\x00\x00\x00\x00\x00\x00\x00\x00\x0c\x06\x16\x00G\x02\xf0\x00\x15\x00\xc8\x00\xef\x00\x06C"\x95D\x00\x00\xb5\x00!\xb6\x00 B\x00\x00\x18\x00\x00\x00\x00\x00\x00\x01\x97_\xa9E[\x00\x01\xde\x8a@\x1e?\xa7\xa6\x00\x00\x00\x00\x00\x00\x00\x00\x0c\x06\x16\x00G\x02\xf0\x00\x15\x00\xc8\x00\xef\x00\x06C"\xc4D\x00\x00\xb5\x00"\xb6\x00!B\x00\x00\x18\x00\x00\x00\x00\x00\x00\x01\x97_\x9d\x10\x15\x00\x01\xde\x8a@\x1e?\xa7\xa6\x00\x00\x00\x00\x00\x00\x00\x00\x0c\x06\x16\x00G\x02\xf0\x00\x15\x00\xc8\x00\xef\x00\x06C"\xf9D\x00\x00\xb5\x00$\xb6\x00#B\x00\x00\x18\x00\x00\x00\x00\x00\x00\x01J\xa2\xca\xcc\n\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x04\x00\x00\x00\xf0\x04\x03\xf0\x01\x15\x00\xef\x00\x01B\x00\x00\x00\x00\x00\x00\x01\x97^\x165\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xdb\x07\x03\xf0\x00\x15\x00\xef\x00\x01B/\xf1\x00\x03\xdb89352016\xdc41417527\xdd451\x00\x00\x00\x00\x00\x10\x00\x000E')
 
-        # Lire données AVL
-        data = conn.recv(4096)
-        if not data or len(data) < 4:
-            print("❌ Données AVL insuffisantes.")
-            conn.close()
-            continue
-
-        avl_data_len = struct.unpack(">I", data[:4])[0]
-        avl_payload = data[4:]  # exclure header TCP
-        if len(avl_payload) < avl_data_len:
-            print("❌ Données incomplètes, la taille réelle est inférieure à celle attendue.")
-            conn.close()
-            continue
-
-
-        print(f"📐 Longueur AVL : {avl_data_len} octets")
-        print(f"🧾 Données Codec 8 : {avl_payload.hex().upper()}")
-
-        try:
-            avl_data_len = struct.unpack(">I", data[0:4])[0]
-            avl_payload = data[4:4 + avl_data_len]
-            dt, lat, lon, speed, io = decode_avl_packet(avl_payload)
-
-            if len(avl_payload) < 10:
-                print("❌ Paquet AVL incomplet ou vide.")
-                conn.close()
-                continue
-
-
-            if 500 in io:
-                print(f"🟦 CAN IO ID 500 = {io[500].hex().upper()}")
-            else:
-                print("❌ Aucune donnée CAN (IO ID 500) trouvée.")
-
-            # Réponse ACK (avec longueur)
-            conn.send(struct.pack(">I", avl_data_len))
-
-        except Exception as e:
-            print(f"❗ Erreur de décodage : {e}")
-
-        conn.close()
-
-if __name__ == "__main__":
-    run_tcp_server()

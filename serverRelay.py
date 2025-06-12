@@ -116,7 +116,15 @@ def run_tcp_server(host='0.0.0.0', port=12345):
         print(f"🧾 Données Codec 8 : {avl_payload.hex().upper()}")
 
         try:
+            avl_data_len = struct.unpack(">I", data[0:4])[0]
+            avl_payload = data[4:4 + avl_data_len]
             dt, lat, lon, speed, io = decode_avl_packet(avl_payload)
+
+            if len(avl_payload) < 10:
+                print("❌ Paquet AVL incomplet ou vide.")
+                conn.close()
+                continue
+
 
             if 500 in io:
                 print(f"🟦 CAN IO ID 500 = {io[500].hex().upper()}")

@@ -79,7 +79,7 @@ def decode_avl_packet(data):
 
     return dt, lat, lon, speed, io_data
 
-def run_tcp_server(host='0.0.0.0', port=5027):
+def run_tcp_server(host='0.0.0.0', port=12345):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((host, port))
     server.listen(1)

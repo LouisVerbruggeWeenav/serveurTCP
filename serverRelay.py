@@ -3,10 +3,8 @@ import struct
 from datetime import datetime
 
 def extract_io_elements(io_data, counts, offset=0):
-    """Parse IO elements and retourne un dict {io_id: value_bytes}"""
     io_dict = {}
     index = offset
-
     for size, count in counts.items():
         for _ in range(count):
             io_id = io_data[index]
@@ -15,62 +13,59 @@ def extract_io_elements(io_data, counts, offset=0):
             index += 1 + size
     return io_dict
 
-def decode_avl_packet(data):
-    codec_id = data[4]
-    record_count = data[5]
-
+def decode_avl_packet(payload):
+    codec_id = payload[0]
+    record_count = payload[1]
     print(f"\n📦 Codec ID: {codec_id} | 📊 Records: {record_count}")
 
-    # Début du premier record
-    index = 6
+    index = 2  # après Codec ID et record count
 
-    timestamp = struct.unpack(">Q", data[index:index+8])[0]
+    # --- pour simplifier, on traite un seul record (le 1er) ---
+    timestamp = struct.unpack(">Q", payload[index:index+8])[0]
     dt = datetime.utcfromtimestamp(timestamp / 1000.0)
     index += 8
 
-    priority = data[index]
+    priority = payload[index]
     index += 1
 
-    # GPS
-    lon = struct.unpack(">i", data[index:index+4])[0] / 10_000_000
-    lat = struct.unpack(">i", data[index+4:index+8])[0] / 10_000_000
+    lon = struct.unpack(">i", payload[index:index+4])[0] / 10_000_000
+    lat = struct.unpack(">i", payload[index+4:index+8])[0] / 10_000_000
     index += 8
 
-    altitude = struct.unpack(">H", data[index:index+2])[0]
-    angle = struct.unpack(">H", data[index+2:index+4])[0]
-    satellites = data[index+4]
-    speed = struct.unpack(">H", data[index+5:index+7])[0]
+    altitude = struct.unpack(">H", payload[index:index+2])[0]
+    angle = struct.unpack(">H", payload[index+2:index+4])[0]
+    satellites = payload[index+4]
+    speed = struct.unpack(">H", payload[index+5:index+7])[0]
     index += 7
 
     print(f"🕓 Timestamp: {dt}")
     print(f"📍 GPS: {lat}, {lon} | 🚗 Speed: {speed} km/h | 🛰 Sats: {satellites}")
 
-    # IO Element section
-    event_io_id = data[index]
-    total_io_count = data[index + 1]
+    # IO elements
+    event_io_id = payload[index]
+    total_io_count = payload[index + 1]
     index += 2
 
-    one_b = data[index]
+    one_b = payload[index]
     index += 1
-    one_b_data = data[index:index + one_b * 2]
+    one_b_data = payload[index:index + one_b * 2]
     index += one_b * 2
 
-    two_b = data[index]
+    two_b = payload[index]
     index += 1
-    two_b_data = data[index:index + two_b * 3]
+    two_b_data = payload[index:index + two_b * 3]
     index += two_b * 3
 
-    four_b = data[index]
+    four_b = payload[index]
     index += 1
-    four_b_data = data[index:index + four_b * 5]
+    four_b_data = payload[index:index + four_b * 5]
     index += four_b * 5
 
-    eight_b = data[index]
+    eight_b = payload[index]
     index += 1
-    eight_b_data = data[index:index + eight_b * 9]
+    eight_b_data = payload[index:index + eight_b * 9]
     index += eight_b * 9
 
-    # Reconstituer dictionnaire IO
     io_data = {}
     io_data.update(extract_io_elements(one_b_data, {1: one_b}))
     io_data.update(extract_io_elements(two_b_data, {2: two_b}))
@@ -89,7 +84,7 @@ def run_tcp_server(host='0.0.0.0', port=12345):
         conn, addr = server.accept()
         print(f"\n📥 Connexion de {addr}")
 
-        # --- Étape 1 : lire IMEI ---
+        # Lire IMEI
         imei_data = conn.recv(1024)
         if len(imei_data) < 2:
             print("❌ Erreur : pas assez de données pour IMEI.")
@@ -100,45 +95,35 @@ def run_tcp_server(host='0.0.0.0', port=12345):
         imei = imei_data[2:2 + imei_len].decode(errors='ignore')
         print(f"📶 IMEI reçu : {imei}")
 
-        # Réponse ACK : 0x01
-        conn.send(b'\x01')
+        conn.send(b'\x01')  # ACK
 
-        # --- Étape 2 : lire le paquet Codec 8 ---
-        data = conn.recv(2048)
-
-        if not data:
-            print("❌ Pas de données Codec.")
+        # Lire données AVL
+        data = conn.recv(4096)
+        if not data or len(data) < 4:
+            print("❌ Données AVL insuffisantes.")
             conn.close()
             continue
 
-        print(f"🧾 Données Codec 8 : {data.hex().upper()}")
+        avl_data_len = struct.unpack(">I", data[:4])[0]
+        avl_payload = data[4:]  # exclure header TCP
+        print(f"📐 Longueur AVL : {avl_data_len} octets")
+        print(f"🧾 Données Codec 8 : {avl_payload.hex().upper()}")
 
         try:
-            avl_data_len = struct.unpack(">I", data[0:4])[0]
-            avl_payload = data[4:]  # on saute les 4 premiers octets TCP
-
-            codec_id = avl_payload[0]
-            records = avl_payload[1]
-
-            print(f"📦 Codec ID: {codec_id} | 📊 Records: {records}")
-
-            print(f"📐 Longueur AVL : {avl_data_len} octets")
-
-            dt, lat, lon, speed, io = decode_avl_packet(data)
+            dt, lat, lon, speed, io = decode_avl_packet(avl_payload)
 
             if 500 in io:
                 print(f"🟦 CAN IO ID 500 = {io[500].hex().upper()}")
             else:
                 print("❌ Aucune donnée CAN (IO ID 500) trouvée.")
 
-            # Répondre ACK
+            # Réponse ACK (avec longueur)
             conn.send(struct.pack(">I", avl_data_len))
 
         except Exception as e:
             print(f"❗ Erreur de décodage : {e}")
 
         conn.close()
-
 
 if __name__ == "__main__":
     run_tcp_server()

@@ -8,6 +8,7 @@ IP_VPS = '51.254.102.27'
 PORT = 12345
 server_address = (IP_VPS, PORT)
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
 client_socket.connect(server_address)
 
 for i in range(1400):

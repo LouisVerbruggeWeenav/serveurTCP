@@ -115,6 +115,13 @@ def run_tcp_server(host='0.0.0.0', port=12345):
 
         try:
             avl_data_len = struct.unpack(">I", data[0:4])[0]
+            avl_payload = data[4:]  # on saute les 4 premiers octets TCP
+
+            codec_id = avl_payload[0]
+            records = avl_payload[1]
+
+            print(f"📦 Codec ID: {codec_id} | 📊 Records: {records}")
+
             print(f"📐 Longueur AVL : {avl_data_len} octets")
 
             dt, lat, lon, speed, io = decode_avl_packet(data)

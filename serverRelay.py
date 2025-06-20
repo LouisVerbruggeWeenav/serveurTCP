@@ -39,7 +39,7 @@ def raspberryData():
    if request.method == 'POST':
         data = flask.request.get_json()
         structData = data.get('structData') if data else None
-        success = data.get('structData') if data else None
+        success = data.get('success') if data else None
         print(f'success: {success}')
         print(structData)
         

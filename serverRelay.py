@@ -39,8 +39,14 @@ def raspberryData():
    if request.method == 'POST':
         data = flask.request.get_json()
         structData = data.get('structData') if data else None
+        success = data.get('structData') if data else None
+        print(f'success: {success}')
         print(structData)
-        return flask.jsonify({'data': 'datadata', 'succes': True})
+        
+        if data != None:
+            return flask.jsonify({'data': 'datadata', 'success': True})
+        else:
+            return flask.jsonify({'data': 'datadata', 'success': False})
 
    print("NEW DATA")
    print

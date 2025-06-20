@@ -8,7 +8,7 @@ app.config["DEBUG"] = True
 @app.route('/', methods=['GET'])
 def home():
    print("Received request for home")
-   dictionary = [{'Vehicle': [{'Status2': []},
+   dictionary = [{'Vehicle kkkkkkkkkkkkkkkk': [{'Status2': []},
               {'AC_Variables': []},
               {'Fault': []},
               {'Tst2': []},
@@ -37,4 +37,4 @@ def home():
 
 
 print("=== Flask démarre ===")
-app.run(host='0.0.0.0', port=5000, debug=True)
+app.run(host='0.0.0.0', port=5000, debug=True)  # 51.254.102.27:5000

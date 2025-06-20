@@ -1,4 +1,6 @@
 import flask
+from flask import Flask, request
+import json
 
 
 app = flask.Flask(__name__)
@@ -32,6 +34,16 @@ def home():
  {'Unknown': []}]
    return flask.jsonify(dictionary)
 
+@app.route('/raspberry/data', methods=['POST'])
+def raspberryData():
+   if request.method == 'POST':
+        data = flask.request.get_json()
+        structData = data.get('structData') if data else None
+        print(structData)
+        return flask.jsonify({'data': 'datadata', 'succes': True})
+
+   print("NEW DATA")
+   print
 
 
 

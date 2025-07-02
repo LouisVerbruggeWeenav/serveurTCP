@@ -39,7 +39,8 @@ def raspberryData():
          data = flask.request.get_json()
          structData = data.get('structData') if data else None
          print(structData)
-         
+         print(len(structData))
+
          content_length = request.content_length or 0
          headers_size = sum(len(k) + len(v) + 4 for k, v in request.headers.items())
          print(f"Taille headers : {headers_size} octets")

@@ -38,7 +38,9 @@ def raspberryData():
    if request.method == 'POST':
          data = flask.request.get_json()
          structData = data.get('structData') if data else None
+         infoBoat = data.get('infoBoat') if data else None
          print(structData)
+         print(infoBoat)
          print("=== Requête reçue ===")
          print(len(structData))
 

@@ -39,6 +39,7 @@ def raspberryData():
          data = flask.request.get_json()
          structData = data.get('structData') if data else None
          print(structData)
+         print("=== Requête reçue ===")
          print(len(structData))
 
          content_length = request.content_length or 0

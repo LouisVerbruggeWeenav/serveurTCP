@@ -45,10 +45,10 @@ def raspberryData():
          print(f"Taille headers : {headers_size} octets")
          print(f"Taille corps : {content_length} octets")
          
-         # if data != None:
-         #       return flask.jsonify({'data': 'datadata'})
-         # else:
-         #       return flask.jsonify({'data': 'datadata'})
+         if data != None:
+               return flask.jsonify({'data': 'datadata'})
+         else:
+               return flask.jsonify({'data': 'datadata'})
 
 
 

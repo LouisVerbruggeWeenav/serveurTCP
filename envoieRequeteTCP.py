@@ -2,10 +2,15 @@
 import requests
 import time
 
-for i in range(10):
-    print(f"Envoi de la requête {i+1}...")
+sendAccu = 0
+while True:
 
-    response = requests.get("http://127.0.0.1:5000")
+
+    response = requests.get("http://51.254.102.27:5000")
+    
+    sendAccu += 1
+
     print(response.text)
-    time.sleep(4)
+    print(f"Envoi de la requête {sendAccu+1}...")
+    time.sleep(2)
 

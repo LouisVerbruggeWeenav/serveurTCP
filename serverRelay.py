@@ -37,18 +37,15 @@ def home():
 @app.route('/raspberry/data', methods=['POST'])
 def raspberryData():
    if request.method == 'POST':
-         data = flask.request.get_json()
-         structData = data.gets('structData') if data else None
-         print(structData)
-         content_length = request.content_length or 0
-         headers_size = sum(len(k) + len(v) + 4 for k, v in request.headers.items())
-         print(f"Taille headers : {headers_size} octets")
-         print(f"Taille corps : {content_length} octets")
-         
-         if data != None:
-               return flask.jsonify({'data': 'datadata'})
-         else:
-               return flask.jsonify({'data': 'datadata'})
+        data = flask.request.get_json()
+        structData = data.get('structData') if data else None
+        print(structData)
+        
+        if data != None:
+            return flask.jsonify({'data': 'datadata', 'success': True})
+        else:
+            return flask.jsonify({'data': 'datadata', 'success': False})
+
 
 
 

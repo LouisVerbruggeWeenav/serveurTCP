@@ -53,8 +53,5 @@ def raspberryData():
                return flask.jsonify({'data': 'datadata', 'success': False})
 
 
-
-
-
 print("=== Flask démarre ===")
 app.run(host='0.0.0.0', port=5000, debug=True)  # 51.254.102.27:5000

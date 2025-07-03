@@ -50,7 +50,7 @@ fakeData = [
     {'timestamp': '1751456633.326713', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"}
 ]
 
-# decryp(fakeData)
+decryp(fakeData)
 
 
 app = flask.Flask(__name__)

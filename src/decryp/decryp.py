@@ -7,7 +7,7 @@ import pprint
 def decryp(tramCan):
     
    
-    fileDbc = FileDbc("../../WEENAV.dbc")
+    fileDbc = FileDbc("./WEENAV.dbc")
     fileTrc = FileTrc(tramCan)
 
     allData = fileTrc.find_data(fileDbc.getDataStruct(), fileDbc.getData())  # Extract data from the TRC file at initialization
@@ -18,7 +18,7 @@ def decryp(tramCan):
         print("ID manquants dans le fichier DBC:")
         print([f"{elem:X}" for elem in fileTrc.getIdManquant()])
 
-    pprint.pprint(allData)
+    print(allData)
 
     return allData
 

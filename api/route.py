@@ -7,48 +7,7 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/decryp')))
 from decryp import decryp
 
-fakeData = [ 
-    {'timestamp': '1751456630.216411', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456630.259738', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456630.260359', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456630.316782', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456630.417131', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456630.517431', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456630.617748', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456630.718087', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456630.818546', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456630.918869', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456631.019279', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456631.119610', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456631.219908', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456631.255573', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456631.256365', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456631.320245', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456631.420612', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456631.520984', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456631.621329', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456631.721689', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456631.822022', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456631.922361', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456632.022700', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456632.123131', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456632.223512', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456632.251874', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456632.252675', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456632.323924', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456632.424226', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456632.524585', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456632.624980', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456632.725331', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456632.825660', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456632.926002', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456633.026341', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456633.126307', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456633.226506', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456633.248010', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456633.248825', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"},
-    {'timestamp': '1751456633.326713', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x19\\x00\\x01\\x03\\x01\\x04\\x01'"}
-]
+fakeData = [{'timestamp': '11:53:20', 'id': 419366912, 'length': '8', 'message': "b'\\x11\\x01\\x00\\x00\\x00\\x00\\x00\\x00'"}, {'timestamp': '11:53:20', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00'"}, {'timestamp': '11:53:21', 'id': 419366912, 'length': '8', 'message': "b'\\x11\\x01\\x00\\x00\\x00\\x00\\x00\\x00'"}, {'timestamp': '11:53:21', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00'"}, {'timestamp': '11:53:22', 'id': 419366912, 'length': '8', 'message': "b'\\x11\\x01\\x00\\x00\\x00\\x00\\x00\\x00'"}, {'timestamp': '11:53:22', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00'"}, {'timestamp': '11:53:23', 'id': 419366912, 'length': '8', 'message': "b'\\x11\\x01\\x00\\x00\\x00\\x00\\x00\\x00'"}, {'timestamp': '11:53:23', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00'"}, {'timestamp': '11:53:24', 'id': 419366912, 'length': '8', 'message': "b'\\x11\\x01\\x00\\x00\\x00\\x00\\x00\\x00'"}, {'timestamp': '11:53:24', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00'"}, {'timestamp': '11:53:25', 'id': 419366912, 'length': '8', 'message': "b'\\x11\\x01\\x00\\x00\\x00\\x00\\x00\\x00'"}, {'timestamp': '11:53:25', 'id': 419366912, 'length': '8', 'message': "b'\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00'"}]
 
 #decryp(fakeData)
 
@@ -99,7 +58,6 @@ def raspberryData():
          print(f"Taille headers : {headers_size} octets")
          print(f"Taille corps : {content_length} octets")
 
-         decryp(structData)
          
          if data != None:
                return flask.jsonify({'data': 'datadata', 'success': True})

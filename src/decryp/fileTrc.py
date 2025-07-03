@@ -33,8 +33,11 @@ class FileTrc:
     
     def decodeMessage(self, can_id, dataMessage, dataDbc, timee):
 
+        # dt = datetime.datetime.fromtimestamp(timestamp)
+        # print(dt.strftime("%d/%m/%Y à %H:%M:%S.%f")[:-3])
+
         message = dataDbc.decode_message(can_id, dataMessage)  
-        temp = [{elem: [[message[elem]], [round(float(timee)/1000, 2)]]} for elem in message]
+        temp = [{elem: [[message[elem]], [timee]]} for elem in message]
         return temp
             
 

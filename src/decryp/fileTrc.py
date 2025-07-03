@@ -1,6 +1,8 @@
 
 from datetime import datetime
+import ast
 import time
+
 
 class FileTrc:
     def __init__(self, tramCan):
@@ -77,7 +79,7 @@ class FileTrc:
                 timee = line['timestamp']
                 can_id = line['id']
                 dlc = line['length']
-                data = line['message']
+                data = ast.literal_eval(line['message'])
                 index = self.findMessageById(dataStruct, f'{can_id:X}')
 
 

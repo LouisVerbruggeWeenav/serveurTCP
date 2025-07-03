@@ -108,8 +108,6 @@ class FileTrc:
                 self.idManquant.add(can_id)
                 continue
 
-        #pprint.pprint(dataStruct)
-
         print(f"temps du traitement: {time.time() - start_time}")
 
         dataStruct = self.cleanData(dataStruct)

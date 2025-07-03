@@ -29,7 +29,6 @@ class FileDbc:
         
         for title in [node.name for node in self.data.nodes] + ["Unknown"]:
             self.dataStruct.append({title: [{f"{tx.name} (ID: 0x{tx.frame_id:X})": []} for tx in [msg for msg in self.data.messages if title in msg.senders or title == "Unknown"]]})
-        pprint.pprint(self.dataStruct)
         print("je suis dans le fichier fileDbc.py, dans la fonction initDataStruct")
 
     def getDataStruct(self):

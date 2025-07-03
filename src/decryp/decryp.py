@@ -18,7 +18,7 @@ def decryp(tramCan):
         print("ID manquants dans le fichier DBC:")
         print([f"{elem:X}" for elem in fileTrc.getIdManquant()])
 
-    print(allData)
+    pprint.pprint(allData)
 
     return allData
 

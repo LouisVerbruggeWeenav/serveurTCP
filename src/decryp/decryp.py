@@ -7,7 +7,7 @@ import pprint
 def decryp(tramCan):
     
    
-    fileDbc = FileDbc("C:/Users/Louis VERBRUGGE/Documents/GITHUB/test_py/WEENAV.dbc")
+    fileDbc = FileDbc("../../WEENAV.dbc")
     fileTrc = FileTrc(tramCan)
 
     allData = fileTrc.find_data(fileDbc.getDataStruct(), fileDbc.getData())  # Extract data from the TRC file at initialization

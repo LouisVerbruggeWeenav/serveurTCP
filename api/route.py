@@ -135,7 +135,7 @@ def get_boat_one():
 
             
 
-            with open(response[2], 'r') as f:
+            with open(f"boats/{response[1]}/{response[2]}.json", 'r') as f:
                   response = json.load(f)
 
             print("=== Boat data ===")

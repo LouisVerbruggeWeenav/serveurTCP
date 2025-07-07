@@ -6,13 +6,17 @@ import os
 import pandas as pd4
 
 
-def make_json_serializable(data):
-    if isinstance(data, list):
-        return [make_json_serializable(i) for i in data]
-    elif isinstance(data, dict):
-        return {k: make_json_serializable(v) for k, v in data.items()}
+from cantools.database.can.signal import NamedSignalValue
+
+def make_json_serializable(obj):
+    if isinstance(obj, dict):
+        return {k: make_json_serializable(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [make_json_serializable(i) for i in obj]
+    elif isinstance(obj, NamedSignalValue):
+        return str(obj)  # ou obj.value si tu veux juste la valeur brute
     else:
-        return data
+        return obj
 
 
 class Boat:

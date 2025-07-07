@@ -45,7 +45,18 @@ app.config["DEBUG"] = True
 
 # testNAME = "test"
 
-# boat.add_boat(testNAME, f"./boats/{testNAME}", outputFake)              
+# boat.add_boat(testNAME, f"./boats/{testNAME}", outputFake)      
+# 
+
+#data = flask.request.get_json()
+# boat_id = 5
+
+
+# response = boat.get_boat_by_id(boat_id)
+# print(f"name of boat: ")
+# print(response)
+# print("\n\n")
+
 
 
 @app.route('/raspberry/data', methods=['POST'])
@@ -77,6 +88,70 @@ def raspberryData():
                   return flask.jsonify({'data': 'datadata', 'success': False})
 
 
+
+# api get all boats grouped by name
+@app.route('/api/boats/grouped', methods=['GET'])
+def get_grouped_boats():
+      try:
+            response = boat.get_grouped_boats()
+            return flask.jsonify(response)
+      except Exception as e:
+            return flask.jsonify({"error": str(e)}), 500
+
+# api select * from boats where name = 'Boat Name'
+@app.route('/api/boats/by-name', methods=['POST'])
+def get_boat_by_id_post():
+      try:
+            data = flask.request.get_json()
+            boat_name = data.get('name') if data else None
+            if not boat_name:
+                  return flask.jsonify({"error": "Boat name is required"}), 400
+            
+
+
+            
+            response = boat.get_boat_by_name(boat_name)
+            print(f"voici la reponse")
+            return flask.jsonify(response)
+      except Exception as e:
+            return flask.jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/boats/one', methods=['POST'])
+def get_boat_one():
+      try:
+            data = flask.request.get_json()
+            boat_id = data.get('id') if data else None
+            if not boat_id:
+                  return flask.jsonify({"error": "Boat name is required"}), 400
+
+            print(boat_id)
+
+            response = boat.get_boat_by_id(boat_id)
+            print(f"name of boat: ")
+            print(response)
+            print("\n\n")
+
+            with open(response[2], 'r') as f:
+                  response[2] = f.read()
+
+
+            return flask.jsonify(response)
+
+
+
+            # response = main(response[3])
+            # if isinstance(response, list):
+            #       print('ok')
+            #       response = {'data': response}
+
+            # response = make_json_serializable(response)
+            # print("ok 2")
+            # return flask.jsonify(response)
+    
+      except Exception as e:
+            print("flop")
+            return flask.jsonify({"error": str(e)}), 500
 
 print("=== Flask démarre ===")
 app.run(host='0.0.0.0', port=5000)  # 51.254.102.27:5000

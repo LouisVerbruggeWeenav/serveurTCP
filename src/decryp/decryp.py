@@ -1,6 +1,6 @@
 
-from fileDbc import FileDbc
-from fileTrc import FileTrc
+from decryp.fileDbc import FileDbc
+from decryp.fileTrc import FileTrc
 
 import pprint
 
@@ -17,8 +17,6 @@ def decryp(tramCan):
         print(f"\033[91mAttention, {len(idManquants)} ID manquants dans le fichier DBC, veuillez vérifier le fichier DBC.\033[0m")
         print("ID manquants dans le fichier DBC:")
         print([f"{elem:X}" for elem in fileTrc.getIdManquant()])
-
-    pprint.pprint(allData)
 
     return allData
 

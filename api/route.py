@@ -3,6 +3,7 @@
 import flask
 from flask import Flask, request
 import pprint 
+import json
 
 
 
@@ -132,11 +133,16 @@ def get_boat_one():
             print(response)
             print("\n\n")
 
+            
+
             with open(response[2], 'r') as f:
-                  response[2] = f.read()
+                  response = json.load(f)
 
+            print("=== Boat data ===")
+            print(response)
+            pprint.pprint(response[0])
 
-            return flask.jsonify(response)
+            return flask.jsonify(response[0])
 
 
 

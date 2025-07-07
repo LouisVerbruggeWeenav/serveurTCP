@@ -7,5 +7,5 @@ for /f "usebackq tokens=1,* delims==" %%A in (".env") do (
 )
 
 echo === Starting BDD ===
-mysql -hlocalhost -u %DB_USER% -p%DB_PASSWORD% < database/schema.sql
+mysql -hlocalhost -u %DB_USER% -p%DB_PASSWORD% < src/database/schema.sql
 

@@ -16,12 +16,12 @@ class Boat:
     def add_boat(self, name, path, dataStruct):
         # add to file
         # verify if the folder exists
-        if not os.path.isdir(path):
-            os.mkdir(path)
+        if not os.path.isdir(f"./boats/{name}"):
+            os.mkdir(f"./boats/{name}")
 
         # add file to the folder
         # convert dataStruct to a DataFrame
-        json_path = os.path.join(path, f"{name}.json")
+        json_path = os.path.join(f"./boats/{name}", f"{name}.json")
         with open(json_path, "w") as f:
             json.dump(dataStruct, f)
 

@@ -65,7 +65,7 @@ def raspberryData():
             print(f"Taille corps : {content_length} octets")
 
             print("=== Ajout du bateau ===")
-            boat.add_boat(infoBoat['name'], f"./boats/{infoBoat['name']}", dataStruct)
+            boat.add_boat(infoBoat['name'], infoBoat['startRecord'], dataStruct)
 
             
             if data != None:

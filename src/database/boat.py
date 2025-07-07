@@ -3,7 +3,16 @@ import json
 from database.connection import Connection
 
 import os
-import pandas as pd
+import pandas as pd4
+
+
+def make_json_serializable(data):
+    if isinstance(data, list):
+        return [make_json_serializable(i) for i in data]
+    elif isinstance(data, dict):
+        return {k: make_json_serializable(v) for k, v in data.items()}
+    else:
+        return data
 
 
 class Boat:
@@ -23,6 +32,7 @@ class Boat:
         # convert dataStruct to a DataFrame
         json_path = os.path.join(f"./boats/{name}", f"{pathFile}.json")
         with open(json_path, "w") as f:
+            dataStruct = make_json_serializable(dataStruct)
             json.dump(dataStruct, f)
 
 

@@ -142,7 +142,7 @@ def get_boat_one():
             print(response)
             pprint.pprint(response[0])
 
-            return flask.jsonify(response[0])
+            return flask.jsonify(response)
 
 
 

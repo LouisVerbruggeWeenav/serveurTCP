@@ -13,7 +13,7 @@ class Boat:
             raise TypeError("\033[91m db must be an instance of Connection \033[0m")
         
 
-    def add_boat(self, name, path, dataStruct):
+    def add_boat(self, name, pathFile, dataStruct):
         # add to file
         # verify if the folder exists
         if not os.path.isdir(f"./boats/{name}"):
@@ -21,14 +21,14 @@ class Boat:
 
         # add file to the folder
         # convert dataStruct to a DataFrame
-        json_path = os.path.join(f"./boats/{name}", f"{name}.json")
+        json_path = os.path.join(f"./boats/{name}", f"{pathFile}.json")
         with open(json_path, "w") as f:
             json.dump(dataStruct, f)
 
 
         # add to database
         conn, mycursor = self.db.cursor()
-        mycursor.execute("INSERT INTO boats (name, path) VALUES (%s, %s)", (name, path))
+        mycursor.execute("INSERT INTO boats (name, path) VALUES (%s, %s)", (name, pathFile))
         conn.commit()
         mycursor.close()
         conn.close()

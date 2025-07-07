@@ -63,6 +63,9 @@ def raspberryData():
             headers_size = sum(len(k) + len(v) + 4 for k, v in request.headers.items())
             print(f"Taille headers : {headers_size} octets")
             print(f"Taille corps : {content_length} octets")
+            print("=== Décryptage des données ===")
+            print(infoBoat['name'])
+            print(infoBoat['startRecord'])
 
             print("=== Ajout du bateau ===")
             boat.add_boat(infoBoat['name'], infoBoat['startRecord'], dataStruct)

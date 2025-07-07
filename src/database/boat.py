@@ -9,10 +9,6 @@ import pandas as pd4
 from cantools.database.can.signal import NamedSignalValue
 
 
-def safe_filename(filename):
-    # Remplace les caractères interdits par un underscore
-    return re.sub(r'[<>:"/\\|?*]', '_', filename)
-
 
 def make_json_serializable(obj):
     if isinstance(obj, dict):
@@ -40,8 +36,7 @@ class Boat:
 
         # add file to the folder
         # convert dataStruct to a DataFrame
-        safe_pathFile = safe_filename(pathFile)
-        json_path = os.path.join(f"./boats/{name}", f"{safe_pathFile}.json")
+        json_path = os.path.join(f"./boats/{name}", f"{pathFile}.json")
         print(json_path)
         print(name)
         print(pathFile)

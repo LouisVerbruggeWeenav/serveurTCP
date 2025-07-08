@@ -42,6 +42,9 @@ boat = Boat(database)
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
+@app.route('/', methods=['GET'])
+def home():
+      return flask.jsonify({'message': 'Welcome to the Boat API'})
 
 
 @app.route('/raspberry/data', methods=['POST'])

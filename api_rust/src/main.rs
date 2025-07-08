@@ -16,8 +16,11 @@ async fn greet(name: web::Path<String>) -> impl Responder {
 async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
-            .service(index)
-            .service(greet)
+        .service(
+            web::scope("/rust")
+                .service(index)
+                .service(greet)
+        )
     })
     .bind(("127.0.0.1", 8080))?
     .run()

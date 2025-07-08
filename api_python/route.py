@@ -1,7 +1,7 @@
 
 
 import flask
-from flask import Flask, request
+from flask import Blueprint, Flask, request
 import pprint 
 import json
 import orjson
@@ -39,15 +39,15 @@ database.connect()
 boat = Boat(database)
 
 
-app = flask.Flask(__name__)
-app.config["DEBUG"] = True
 
-@app.route('/', methods=['GET'])
+python_api = Blueprint('python_api', __name__, url_prefix='/python')
+
+@python_api.route('/', methods=['GET'])
 def home():
       return flask.jsonify({'message': 'Welcome to the Boat API'})
 
 
-@app.route('/raspberry/data', methods=['POST'])
+@python_api.route('/raspberry/data', methods=['POST'])
 def raspberryData():
       if request.method == 'POST':
             data = flask.request.get_json()
@@ -71,7 +71,7 @@ def raspberryData():
 
 
 # api get all boats grouped by name
-@app.route('/api/boats/grouped', methods=['GET'])
+@python_api.route('/api/boats/grouped', methods=['GET'])
 def get_grouped_boats():
       try:
             response = boat.get_grouped_boats()
@@ -80,7 +80,7 @@ def get_grouped_boats():
             return flask.jsonify({"error": str(e)}), 500
 
 # api select * from boats where name = 'Boat Name'
-@app.route('/api/boats/by-name', methods=['POST'])
+@python_api.route('/api/boats/by-name', methods=['POST'])
 def get_boat_by_id_post():
       try:
             data = flask.request.get_json()
@@ -94,7 +94,7 @@ def get_boat_by_id_post():
             return flask.jsonify({"error": str(e)}), 500
 
 
-@app.route('/api/boats/one', methods=['POST'])
+@python_api.route('/api/boats/one', methods=['POST'])
 def get_boat_one():
       try:
             data = flask.request.get_json()
@@ -114,6 +114,15 @@ def get_boat_one():
 
       except Exception as e:
             return flask.jsonify({"error": str(e)}), 500
+
+
+
+# Création de l'app principale
+app = Flask(__name__)
+app.config["DEBUG"] = True
+
+# Enregistrement du blueprint
+app.register_blueprint(python_api)
 
 print("=== Flask démarre ===")
 app.run(host='127.0.0.1', port=8000)  # 51.254.102.27:5000

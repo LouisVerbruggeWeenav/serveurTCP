@@ -101,22 +101,16 @@ def get_boat_one():
 
             response = boat.get_boat_by_id(boat_id)
 
-            
-            print("ok 1")
-
             with open(f"boats/{response[1]}/{response[2]}.json", 'rb') as f:
                   response = orjson.loads(f.read())  # En mode binaire
-
-            print("ok 2")
 
             return flask.Response(
                   orjson.dumps(response),
                   content_type='application/json'
             )
 
-    
       except Exception as e:
             return flask.jsonify({"error": str(e)}), 500
 
 print("=== Flask démarre ===")
-app.run(host='0.0.0.0', port=5000)  # 51.254.102.27:5000
+app.run(host='127.0.0.1', port=8000)  # 51.254.102.27:5000

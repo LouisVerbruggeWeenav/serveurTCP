@@ -19,6 +19,8 @@ from database.boat import Boat
 
 from dotenv import dotenv_values, load_dotenv
 
+from functools import lru_cache
+
 load_dotenv()
 dotenv = dotenv_values(".env")
 

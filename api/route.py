@@ -5,8 +5,7 @@ from flask import Flask, request
 import pprint 
 import json
 import orjson
-from flask import Response
-import time
+
 
 
 import sys
@@ -19,8 +18,6 @@ from database.boat import Boat
 
 from dotenv import dotenv_values, load_dotenv
 
-from functools import lru_cache
-
 load_dotenv()
 dotenv = dotenv_values(".env")
 
@@ -28,6 +25,18 @@ dotenv = dotenv_values(".env")
 # print(decryp(fakeData))
 
 # outputFake = [{'GARMIN': [{'OBC_MTA_Control (ID: 0x18FF0800)': [{'CtlStopCharge': [['ON', 'OFF', 'ON', 'OFF', 'ON', 'OFF', 'ON', 'OFF', 'ON', 'OFF', 'ON', 'OFF'], ['11:53:20', '11:53:20', '11:53:21', '11:53:21', '11:53:22', '11:53:22', '11:53:23', '11:53:23', '11:53:24', '11:53:24', '11:53:25', '11:53:25']]}, {'CtlRmode': [['OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF'], ['11:53:20', '11:53:20', '11:53:21', '11:53:21', '11:53:22', '11:53:22', '11:53:23', '11:53:23', '11:53:24', '11:53:24', '11:53:25', '11:53:25']]}, {'CtlCANEnable': [['OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF'], ['11:53:20', '11:53:20', '11:53:21', '11:53:21', '11:53:22', '11:53:22', '11:53:23', '11:53:23', '11:53:24', '11:53:24', '11:53:25', '11:53:25']]}, {'CtlIacMaxSet': [[0.1, 0.0, 0.1, 0.0, 0.1, 0.0, 0.1, 0.0, 0.1, 0.0, 0.1, 0.0], ['11:53:20', '11:53:20', '11:53:21', '11:53:21', '11:53:22', '11:53:22', '11:53:23', '11:53:23', '11:53:24', '11:53:24', '11:53:25', '11:53:25']]}, {'CtlVoutMaxSet': [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], ['11:53:20', '11:53:20', '11:53:21', '11:53:21', '11:53:22', '11:53:22', '11:53:23', '11:53:23', '11:53:24', '11:53:24', '11:53:25', '11:53:25']]}, {'CtlIoutMaxSet': [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], ['11:53:20', '11:53:20', '11:53:21', '11:53:21', '11:53:22', '11:53:22', '11:53:23', '11:53:23', '11:53:24', '11:53:24', '11:53:25', '11:53:25']]}]}]}]
+
+BOAT_CACHE = {}
+
+def load_all_jsons():
+    for dirpath, _, filenames in os.walk('boats'):
+        for filename in filenames:
+            if filename.endswith('.json'):
+                path = os.path.join(dirpath, filename)
+                with open(path, 'rb') as f:
+                    key = path.split("boats/")[1].replace(".json", "")
+                    BOAT_CACHE[key] = orjson.loads(f.read())
+
 
 
 database = Connection(
@@ -46,11 +55,6 @@ app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
 
-@lru_cache(maxsize=128)
-def load_json(path: str):
-    with open(path, 'rb') as f:
-        return orjson.loads(f.read())
-    
 
 @app.route('/raspberry/data', methods=['POST'])
 def raspberryData():
@@ -107,17 +111,12 @@ def get_boat_one():
             if not boat_id:
                   return flask.jsonify({"error": "Boat name is required"}), 400
 
-            # Suppose que boat.get_boat_by_id() est rapide
             b = boat.get_boat_by_id(boat_id)
+            key = f"{b[1]}/{b[2]}"
+            response = orjson.dumps(BOAT_CACHE[key])
 
-            json_path = f"boats/{b[1]}/{b[2]}.json"
-            payload = load_json(json_path)
+            return flask.Response(response, content_type='application/json')
 
-            # Encode avec orjson (ultra rapide)
-            response = orjson.dumps(payload)
-
-
-            return Response(response, content_type='application/json')
 
       
       except Exception as e:

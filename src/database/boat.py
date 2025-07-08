@@ -78,7 +78,6 @@ class Boat:
         conn, mycursor = self.db.cursor()
         mycursor.execute("SELECT * FROM boats WHERE id = %s", (boat_id,))
         result = mycursor.fetchall()
-        print(result)
         mycursor.close()
         conn.close()
         if not result:

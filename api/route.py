@@ -4,6 +4,7 @@ import flask
 from flask import Flask, request
 import pprint 
 import json
+import orjson
 
 
 
@@ -102,12 +103,17 @@ def get_boat_one():
 
             
             print("ok 1")
-            with open(f"boats/{response[1]}/{response[2]}.json", 'r') as f:
-                  response = json.load(f)
+
+            with open(f"boats/{response[1]}/{response[2]}.json", 'rb') as f:
+                  response = orjson.loads(f.read())  # En mode binaire
 
             print("ok 2")
 
-            return flask.jsonify(response)
+            return flask.Response(
+                  orjson.dumps(response),
+                  content_type='application/json'
+            )
+
     
       except Exception as e:
             return flask.jsonify({"error": str(e)}), 500

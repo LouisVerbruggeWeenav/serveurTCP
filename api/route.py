@@ -105,22 +105,24 @@ def get_boat_by_id_post():
 
 @app.route('/api/boats/one', methods=['POST'])
 def get_boat_one():
-      try:
-            data = flask.request.get_json()
-            boat_id = data.get('id') if data else None
-            if not boat_id:
-                  return flask.jsonify({"error": "Boat name is required"}), 400
+    try:
+        data = flask.request.get_json()
+        boat_id = data.get('id') if data else None
+        if not boat_id:
+            return flask.jsonify({"error": "Boat ID is required"}), 400
 
-            b = boat.get_boat_by_id(boat_id)
-            key = f"{b[1]}/{b[2]}"
-            response = orjson.dumps(BOAT_CACHE[key])
+        b = boat.get_boat_by_id(boat_id)
+        key = f"{b[1]}/{b[2]}"
 
-            return flask.Response(response, content_type='application/json')
+        if key not in BOAT_CACHE:
+            return flask.jsonify({"error": f"Boat data not found for key: {key}"}), 404
 
+        response = orjson.dumps(BOAT_CACHE[key])
+        return flask.Response(response, content_type='application/json')
 
-      
-      except Exception as e:
-            return flask.jsonify({"error": str(e)}), 500
+    except Exception as e:
+        return flask.jsonify({"error": str(e)}), 500
+
 
 print("=== Flask démarre ===")
 app.run(host='0.0.0.0', port=5000)  # 51.254.102.27:5000

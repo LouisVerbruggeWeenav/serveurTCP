@@ -5,7 +5,8 @@ from flask import Flask, request
 import pprint 
 import json
 import orjson
-
+from flask import Response
+import time
 
 
 import sys
@@ -43,6 +44,11 @@ app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
 
+@lru_cache(maxsize=128)
+def load_json(path: str):
+    with open(path, 'rb') as f:
+        return orjson.loads(f.read())
+    
 
 @app.route('/raspberry/data', methods=['POST'])
 def raspberryData():
@@ -99,22 +105,19 @@ def get_boat_one():
             if not boat_id:
                   return flask.jsonify({"error": "Boat name is required"}), 400
 
-            response = boat.get_boat_by_id(boat_id)
+            # Suppose que boat.get_boat_by_id() est rapide
+            b = boat.get_boat_by_id(boat_id)
 
-            
-            print("ok 1")
+            json_path = f"boats/{b[1]}/{b[2]}.json"
+            payload = load_json(json_path)
 
-            with open(f"boats/{response[1]}/{response[2]}.json", 'rb') as f:
-                  response = orjson.loads(f.read())  # En mode binaire
+            # Encode avec orjson (ultra rapide)
+            response = orjson.dumps(payload)
 
-            print("ok 2")
 
-            return flask.Response(
-                  orjson.dumps(response),
-                  content_type='application/json'
-            )
+            return Response(response, content_type='application/json')
 
-    
+      
       except Exception as e:
             return flask.jsonify({"error": str(e)}), 500
 

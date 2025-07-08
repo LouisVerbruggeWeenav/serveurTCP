@@ -44,7 +44,7 @@ python_api = Blueprint('python_api', __name__, url_prefix='/python')
 
 @python_api.route('/', methods=['GET'])
 def home():
-      return flask.jsonify({'message': 'Welcome to the Boat API'})
+      return flask.jsonify({'message': 'Welcome to the Boat API python'})
 
 
 @python_api.route('/raspberry/data', methods=['POST'])

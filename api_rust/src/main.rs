@@ -2,7 +2,7 @@ use actix_web::{get, web, App, HttpServer, Responder};
 
 #[get("/")]
 async fn index() -> impl Responder {
-    "Welcome to the API!"
+    "Welcome to the API! rust"
 }
 
 #[get("/hello/{name}")]
@@ -26,6 +26,3 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
-
-
-// pour lancer sur le serveur:

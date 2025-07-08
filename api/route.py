@@ -26,18 +26,6 @@ dotenv = dotenv_values(".env")
 
 # outputFake = [{'GARMIN': [{'OBC_MTA_Control (ID: 0x18FF0800)': [{'CtlStopCharge': [['ON', 'OFF', 'ON', 'OFF', 'ON', 'OFF', 'ON', 'OFF', 'ON', 'OFF', 'ON', 'OFF'], ['11:53:20', '11:53:20', '11:53:21', '11:53:21', '11:53:22', '11:53:22', '11:53:23', '11:53:23', '11:53:24', '11:53:24', '11:53:25', '11:53:25']]}, {'CtlRmode': [['OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF'], ['11:53:20', '11:53:20', '11:53:21', '11:53:21', '11:53:22', '11:53:22', '11:53:23', '11:53:23', '11:53:24', '11:53:24', '11:53:25', '11:53:25']]}, {'CtlCANEnable': [['OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF', 'OFF'], ['11:53:20', '11:53:20', '11:53:21', '11:53:21', '11:53:22', '11:53:22', '11:53:23', '11:53:23', '11:53:24', '11:53:24', '11:53:25', '11:53:25']]}, {'CtlIacMaxSet': [[0.1, 0.0, 0.1, 0.0, 0.1, 0.0, 0.1, 0.0, 0.1, 0.0, 0.1, 0.0], ['11:53:20', '11:53:20', '11:53:21', '11:53:21', '11:53:22', '11:53:22', '11:53:23', '11:53:23', '11:53:24', '11:53:24', '11:53:25', '11:53:25']]}, {'CtlVoutMaxSet': [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], ['11:53:20', '11:53:20', '11:53:21', '11:53:21', '11:53:22', '11:53:22', '11:53:23', '11:53:23', '11:53:24', '11:53:24', '11:53:25', '11:53:25']]}, {'CtlIoutMaxSet': [[0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], ['11:53:20', '11:53:20', '11:53:21', '11:53:21', '11:53:22', '11:53:22', '11:53:23', '11:53:23', '11:53:24', '11:53:24', '11:53:25', '11:53:25']]}]}]}]
 
-BOAT_CACHE = {}
-
-def load_all_jsons():
-    for dirpath, _, filenames in os.walk('boats'):
-        for filename in filenames:
-            if filename.endswith('.json'):
-                path = os.path.join(dirpath, filename)
-                with open(path, 'rb') as f:
-                    key = path.split("boats/")[1].replace(".json", "")
-                    BOAT_CACHE[key] = orjson.loads(f.read())
-
-
 
 database = Connection(
       host=dotenv.get("DB_HOST"),
@@ -105,24 +93,30 @@ def get_boat_by_id_post():
 
 @app.route('/api/boats/one', methods=['POST'])
 def get_boat_one():
-    try:
-        data = flask.request.get_json()
-        boat_id = data.get('id') if data else None
-        if not boat_id:
-            return flask.jsonify({"error": "Boat ID is required"}), 400
+      try:
+            data = flask.request.get_json()
+            boat_id = data.get('id') if data else None
+            if not boat_id:
+                  return flask.jsonify({"error": "Boat name is required"}), 400
 
-        b = boat.get_boat_by_id(boat_id)
-        key = f"{b[1]}/{b[2]}"
+            response = boat.get_boat_by_id(boat_id)
 
-        if key not in BOAT_CACHE:
-            return flask.jsonify({"error": f"Boat data not found for key: {key}"}), 404
+            
+            print("ok 1")
 
-        response = orjson.dumps(BOAT_CACHE[key])
-        return flask.Response(response, content_type='application/json')
+            with open(f"boats/{response[1]}/{response[2]}.json", 'rb') as f:
+                  response = orjson.loads(f.read())  # En mode binaire
 
-    except Exception as e:
-        return flask.jsonify({"error": str(e)}), 500
+            print("ok 2")
 
+            return flask.Response(
+                  orjson.dumps(response),
+                  content_type='application/json'
+            )
+
+    
+      except Exception as e:
+            return flask.jsonify({"error": str(e)}), 500
 
 print("=== Flask démarre ===")
 app.run(host='0.0.0.0', port=5000)  # 51.254.102.27:5000

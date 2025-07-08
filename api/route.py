@@ -44,21 +44,6 @@ app = flask.Flask(__name__)
 app.config["DEBUG"] = True
 
 
-# testNAME = "test"
-
-# boat.add_boat(testNAME, f"./boats/{testNAME}", outputFake)      
-# 
-
-#data = flask.request.get_json()
-# boat_id = 5
-
-
-# response = boat.get_boat_by_id(boat_id)
-# print(f"name of boat: ")
-# print(response)
-# print("\n\n")
-
-
 
 @app.route('/raspberry/data', methods=['POST'])
 def raspberryData():
@@ -67,19 +52,12 @@ def raspberryData():
             structData = data.get('structData') if data else None
             infoBoat = data.get('infoBoat') if data else None
             dataStruct = decryp(structData)
-            print(infoBoat)
-            print("=== Requête reçue ===")
-            print(len(structData))
 
             content_length = request.content_length or 0
             headers_size = sum(len(k) + len(v) + 4 for k, v in request.headers.items())
             print(f"Taille headers : {headers_size} octets")
             print(f"Taille corps : {content_length} octets")
-            print("=== Décryptage des données ===")
-            print(infoBoat['name'])
-            print(infoBoat['startRecord'])
-
-            print("=== Ajout du bateau ===")
+            
             boat.add_boat(infoBoat['name'], infoBoat['startRecord'], dataStruct)
 
             
@@ -108,11 +86,7 @@ def get_boat_by_id_post():
             if not boat_name:
                   return flask.jsonify({"error": "Boat name is required"}), 400
             
-
-
-            
             response = boat.get_boat_by_name(boat_name)
-            print(f"voici la reponse")
             return flask.jsonify(response)
       except Exception as e:
             return flask.jsonify({"error": str(e)}), 500
@@ -126,37 +100,16 @@ def get_boat_one():
             if not boat_id:
                   return flask.jsonify({"error": "Boat name is required"}), 400
 
-            print(boat_id)
-
             response = boat.get_boat_by_id(boat_id)
-            print(f"name of boat: ")
-            print(response)
-            print("\n\n")
 
             
 
             with open(f"boats/{response[1]}/{response[2]}.json", 'r') as f:
                   response = json.load(f)
 
-            print("=== Boat data ===")
-            print(response)
-            pprint.pprint(response[0])
-
             return flask.jsonify(response)
-
-
-
-            # response = main(response[3])
-            # if isinstance(response, list):
-            #       print('ok')
-            #       response = {'data': response}
-
-            # response = make_json_serializable(response)
-            # print("ok 2")
-            # return flask.jsonify(response)
     
       except Exception as e:
-            print("flop")
             return flask.jsonify({"error": str(e)}), 500
 
 print("=== Flask démarre ===")

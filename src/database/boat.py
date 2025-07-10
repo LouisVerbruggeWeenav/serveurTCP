@@ -71,7 +71,7 @@ class Boat:
     
     def get_boat_by_id(self, boat_id):
         conn, mycursor = self.db.cursor()
-        mycursor.execute("SELECT * FROM boats WHERE id = %s", (boat_id,))
+        mycursor.execute("SELECT id, name, path FROM boats WHERE id = %s", (boat_id,))
         result = mycursor.fetchall()
         mycursor.close()
         conn.close()

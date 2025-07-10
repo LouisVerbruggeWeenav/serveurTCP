@@ -67,11 +67,7 @@ async fn get_boat_one(data: web::Data<AppState>, info: web::Json<Info>) -> impl 
         }
     }
 
-
     Json(json)
-
-
-
 }
 
 

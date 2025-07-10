@@ -33,7 +33,7 @@ struct Info {
 
 
 
-#[post("/boats/one")]
+#[post("api/boats/one")]
 async fn get_boat_one(data: web::Data<AppState>, info: web::Json<Info>) -> impl Responder {
     
     let mut json: serde_json::Value = serde_json::Value::Null;

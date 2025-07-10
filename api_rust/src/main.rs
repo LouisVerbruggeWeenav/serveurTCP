@@ -54,7 +54,8 @@ async fn get_boat_one(data: web::Data<AppState>, info: web::Json<Info>) -> impl 
                     }
                 },
                 Err(e) => {
-                    eprintln!("Erreur de lecture du fichier : {}", e);
+                    let pathFail = format!("{}/{}.json", boats.path, boats.name);
+                    eprintln!("Erreur de lecture du fichier : {} {}", e, pathFail);
                     serde_json::json!({ "error": format!("File read failed: {}", e) })
                 }
             }

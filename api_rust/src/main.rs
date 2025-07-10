@@ -42,7 +42,7 @@ async fn get_boat_one(data: web::Data<AppState>, info: web::Json<Info>) -> impl 
     match boat.get_boat_by_id(info.id) {
         Ok(boats) => {           
 
-            json = match fs::read_to_string(format!("{}/{}.json", boats.name, boats.path)) {
+            json = match fs::read_to_string(format!("./boats/{}/{}.json", boats.name, boats.path)) {
                 Ok(contenu) => { 
                     match serde_json::from_str(&contenu) {
                         Ok(dataJson) => dataJson,
@@ -54,7 +54,7 @@ async fn get_boat_one(data: web::Data<AppState>, info: web::Json<Info>) -> impl 
                     }
                 },
                 Err(e) => {
-                    let pathFail = format!("{}/{}.json", boats.name, boats.path);
+                    let pathFail = format!("./boats/{}/{}.json", boats.name, boats.path);
                     eprintln!("Erreur de lecture du fichier : {} {}", e, pathFail);
                     serde_json::json!({ "error": format!("File read failed: {}", e) })
                 }

@@ -34,12 +34,7 @@ class Boat:
         if not os.path.isdir(f"./boats/{name}"):
             os.mkdir(f"./boats/{name}")
 
-        # add file to the folder
-        # convert dataStruct to a DataFrame
         json_path = os.path.join(f"./boats/{name}", f"{pathFile}.json")
-        print(json_path)
-        print(name)
-        print(pathFile)
         with open(json_path, "w") as f:
             dataStruct = make_json_serializable(dataStruct)
             json.dump(dataStruct, f)

@@ -104,7 +104,7 @@ def get_boat_one():
 
             response = boat.get_boat_by_id(boat_id)
 
-            with open(f"boats/{response[1]}/{response[2]}.json", 'rb') as f:
+            with open(f"{response[2]}/{response[1]}.json", 'rb') as f:
                   response = orjson.loads(f.read())  # En mode binaire
 
             return flask.Response(

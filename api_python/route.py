@@ -93,7 +93,6 @@ def get_boat_by_id_post():
       except Exception as e:
             return flask.jsonify({"error": str(e)}), 500
 
-
 @python_api.route('/api/boats/one', methods=['POST'])
 def get_boat_one():
       try:
@@ -104,7 +103,7 @@ def get_boat_one():
 
             response = boat.get_boat_by_id(boat_id)
 
-            with open(f"{response[2]}/{response[1]}.json", 'rb') as f:
+            with open(f"{response[1]}/{response[2]}.json", 'rb') as f:
                   response = orjson.loads(f.read())  # En mode binaire
 
             return flask.Response(
@@ -114,8 +113,6 @@ def get_boat_one():
 
       except Exception as e:
             return flask.jsonify({"error": str(e)}), 500
-
-
 
 # Création de l'app principale
 app = Flask(__name__)

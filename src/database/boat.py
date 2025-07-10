@@ -31,10 +31,10 @@ class Boat:
     def add_boat(self, name, pathFile, dataStruct):
         # add to file
         # verify if the folder exists
-        if not os.path.isdir(f"./boats/{name}"):
-            os.mkdir(f"./boats/{name}")
+        if not os.path.isdir(f"./api_rust/boats/{name}"):
+            os.mkdir(f"./api_rust/boats/{name}")
 
-        json_path = os.path.join(f"./boats/{name}", f"{pathFile}.json")
+        json_path = os.path.join(f"./api_rust/boats/{name}", f"{pathFile}.json")
         with open(json_path, "w") as f:
             dataStruct = make_json_serializable(dataStruct)
             json.dump(dataStruct, f)

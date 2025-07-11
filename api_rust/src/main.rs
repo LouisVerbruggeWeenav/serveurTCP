@@ -33,9 +33,35 @@ struct InfoFrontOne {
 }
 
 #[derive(Deserialize, Clone)]
-struct InfoFrontByName {
-    name: String
+struct InfoRaspberrypi{
+    structData: String
 }
+
+#[derive(Deserialize, Clone)]
+struct InfoFrontByName {
+    name: String,
+}
+
+#[derive(Debug, Deserialize)]
+
+struct CanFrame {
+    timestamp: String,
+    id: u32,
+    lenght: String,
+    message: String
+}
+
+
+#[post("/raspberrypi/data")]
+async fn raspberryData(data: web::Data<AppState>, info: web::Json<InfoRaspberrypi>) ->  impl Responder {
+
+    print!("go to decreypt");
+    functionDecryptPython(info.structData.clone());
+    print!("ok pour le decrypt !");
+    "OK"
+}
+
+
 
 
 #[get("/")]
@@ -50,6 +76,8 @@ async fn index() -> impl Responder {
         json
     )
 }
+
+
 
 
 #[get("/boats/grouped")]
@@ -160,20 +188,8 @@ async fn get_boat_one(data: web::Data<AppState>, info: web::Json<InfoFrontOne>) 
 
 
 
-
-// #[get("/hello/{name}")]
-// async fn greet(data: web::Data<AppState>, name: web::Path<String>) -> impl Responder {
-
-//     let mut boat = data.boat.lock().unwrap(); // <- maintenant tu peux muter !
-//     let test = boat.getTest();
-//     format!("Hello {name} {chiffre}!")
-// }
-
-
-
-
-fn functionDecryptPython() -> PyResult<()> {
-    let code_str = fs::read_to_string("./main.py").expect("Fichier Python introuvable");
+fn functionDecryptPython(tramCan: String) -> PyResult<()> {
+    let code_str = fs::read_to_string("./src/decryp/decryp.py").expect("Fichier Python introuvable");
 
     let code_cstring = CString::new(code_str).expect("CString::new failed");
     let filename = CString::new("main.py").unwrap();
@@ -181,7 +197,13 @@ fn functionDecryptPython() -> PyResult<()> {
 
     Python::with_gil(|py| {
         let module = PyModule::from_code(py, code_cstring.as_c_str(), filename.as_c_str(), modulename.as_c_str())?;
-        module.getattr("run")?.call1(("hello louis".to_string(), ))?;
+        let result = module.getattr("run")?.call1((tramCan, ))?;
+
+        let json_str: String = result.extract()?;
+        let parsed: Value = serde_json::from_str(&json_str).expect("JSON invalide");
+
+        println!("Résultat JSON : {}", parsed);
+
         Ok(())
     })
 }
@@ -230,8 +252,27 @@ async fn main() -> std::io::Result<()> {
     // }
 
     // SCRIPT PYTHON:
-    //
-    // function_python();
+
+    // let json_raw = r#"
+    // [
+    //     {
+    //         "timestamp": "11:53:20",
+    //         "id": 419366912,
+    //         "length": "8",
+    //         "message": "b'\\x11\\x01\\x00\\x00\\x00\\x00\\x00\\x00'"
+    //     },
+    //     {
+    //         "timestamp": "11:53:20",
+    //         "id": 419366912,
+    //         "length": "8",
+    //         "message": "b'\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00'"
+    //     }
+    // ]
+    // "#;
+
+
+    
+    // functionDecryptPython(json_raw);
 
 
     let config = web::Data::new(AppState { boat: Mutex::new(boat), });
@@ -248,6 +289,7 @@ async fn main() -> std::io::Result<()> {
                 .service(get_boat_one)
                 .service(get_grouped_boats)
                 .service(get_boat_by_id_post)
+                .service(raspberryData)
         )
     })
     .bind(("127.0.0.1", 8080))?

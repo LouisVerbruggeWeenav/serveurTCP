@@ -49,6 +49,7 @@ python_api = Blueprint('python_api', __name__, url_prefix='/python')
 
 @python_api.route('/raspberry/data', methods=['POST'])
 def raspberryData():
+      print("hello")
       if request.method == 'POST':
             data = flask.request.get_json()
             structData = data.get('structData') if data else None
@@ -124,4 +125,5 @@ app.config["DEBUG"] = True
 app.register_blueprint(python_api)
 
 print("=== Flask démarre ===")
-app.run(host='127.0.0.1', port=8000)  # 51.254.102.27:5000
+#app.run(host='127.0.0.1', port=8000)  # 51.254.102.27:5000
+app.run(host='0.0.0.0', port=8000)

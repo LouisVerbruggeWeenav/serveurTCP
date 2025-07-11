@@ -49,9 +49,9 @@ BO_ 2453671975 BMS_TEMP_SUPERMASTER: 7 BMS
  SG_ MaxTempModule : 48|8@1+ (1,0) [0|0] ""  GARMIN
  SG_ MinTempModule : 40|8@1+ (1,0) [0|0] ""  GARMIN
  SG_ TimeRemaining : 24|16@1+ (1,0) [0|0] "min"  GARMIN
- SG_ AverageModuleTemp : 16|8@1- (1,-40) [0|0] "°C"  GARMIN
- SG_ MaxModuleTemp : 8|8@1- (1,-40) [0|0] "°C"  GARMIN
- SG_ MinModuleTemp : 0|8@1- (1,-40) [0|0] "°C"  GARMIN
+ SG_ AverageModuleTemp : 16|8@1- (1,-40) [0|0] "ï¿½C"  GARMIN
+ SG_ MaxModuleTemp : 8|8@1- (1,-40) [0|0] "ï¿½C"  GARMIN
+ SG_ MinModuleTemp : 0|8@1- (1,-40) [0|0] "ï¿½C"  GARMIN
 
 BO_ 2566848767 NAVIGATION_SPEED: 8 GARMIN
  SG_ InstantPower : 16|32@1- (0.001,0) [0|0] "KW" Vector__XXX
@@ -81,8 +81,8 @@ BO_ 2551994198 RNL_OBC_STATUS: 2 GARMIN
  SG_ CF_Obc_Ready : 0|1@1+ (1,0) [0|1] "" Vector__XXX
 
 BO_ 2629891158 EVCC_TEMP: 4 EVCC_RNL
- SG_ EVCC_InletTemperature2 : 16|16@1- (1,0) [-60|200] "°C"  GARMIN
- SG_ EVCC_InletTemperature1 : 0|16@1- (1,0) [-60|200] "°C"  GARMIN
+ SG_ EVCC_InletTemperature2 : 16|16@1- (1,0) [-60|200] "ï¿½C"  GARMIN
+ SG_ EVCC_InletTemperature1 : 0|16@1- (1,0) [-60|200] "ï¿½C"  GARMIN
 
 BO_ 2552099926 EVCC_Min: 8 EVCC_RNL
  SG_ Secc_ACMaxCurrentValue : 57|7@1+ (1,0) [6|80] "A"  GARMIN
@@ -188,13 +188,13 @@ BO_ 2563688199 Events: 8 INVERTER
 BO_ 2563753735 Diagnostics3: 6 INVERTER
  SG_ ActiveEvents : 40|8@1+ (1,0) [0|20] ""  GARMIN
  SG_ ActualControlMode : 32|8@1+ (1,0) [0|255] ""  GARMIN
- SG_ CanSignalInverterTemp : 16|16@1+ (1,-32768) [-32767|210] "°C"  GARMIN
- SG_ CanSignalMotorTemp : 0|16@1+ (1,-32768) [-32768|210] "°C"  GARMIN
+ SG_ CanSignalInverterTemp : 16|16@1+ (1,-32768) [-32767|210] "ï¿½C"  GARMIN
+ SG_ CanSignalMotorTemp : 0|16@1+ (1,-32768) [-32768|210] "ï¿½C"  GARMIN
 
 BO_ 2563557127 Diagnostics2: 8 INVERTER
  SG_ Id : 48|16@1+ (1,-3276) [-3276|3276] "Apk"  GARMIN
  SG_ Iq : 32|16@1+ (1,-3276) [-3276|3276] "Apk"  GARMIN
- SG_ SensorAngle : 16|16@1+ (0.1,-3276.8) [-180|179.9] "°C"  GARMIN
+ SG_ SensorAngle : 16|16@1+ (0.1,-3276.8) [-180|179.9] "ï¿½C"  GARMIN
  SG_ RegulatorStatus : 8|8@1+ (1,0) [0|3] ""  GARMIN
  SG_ ActualLimitationType : 0|8@1+ (1,0) [0|15] ""  GARMIN
 
@@ -242,7 +242,7 @@ BO_ 2566869477 OBC_INPUT_INFO: 8 OBC_DILONG
  SG_ InputVoltageHighByte : 0|8@1+ (0.1,0) [0|0] "V"  GARMIN
 
 BO_ 2566869221 OBC_CONTROL_STATUS: 8 OBC_DILONG
- SG_ InternalTemperature : 48|8@1- (1,-40) [0|0] "°C"  GARMIN
+ SG_ InternalTemperature : 48|8@1- (1,-40) [0|0] "ï¿½C"  GARMIN
  SG_ CommunicationStatus : 36|1@1+ (1,0) [0|0] ""  GARMIN
  SG_ StartingState : 35|1@1+ (1,0) [0|0] ""  GARMIN
  SG_ InputVoltage : 34|1@1+ (1,0) [0|0] ""  GARMIN
@@ -264,7 +264,7 @@ BO_ 2550588916 OBC_DILONG_COMMAND: 8 GARMIN
 BO_ 2197821969 BMS_HEATER_MANAGEMENT: 4 GARMIN
  SG_ DelayHeat : 24|8@1+ (1,0) [0|0] "min" Vector__XXX
  SG_ RateHeat : 16|8@1- (1,0) [1|10] "" Vector__XXX
- SG_ TempHeat : 8|8@1- (1,-40) [-20|60] "°C" Vector__XXX
+ SG_ TempHeat : 8|8@1- (1,-40) [-20|60] "ï¿½C" Vector__XXX
  SG_ Ctlheat : 0|8@1+ (1,0) [0|0] "" Vector__XXX
 
 BO_ 2466388485 BMS_MAINTENANCE_MESSAGE: 1 Vector__XXX
@@ -306,9 +306,9 @@ BO_ 2449477664 BMS_STATUS1_MASTER_SLAVE: 8 BMS
  SG_ Voltage : 0|16@1+ (0.001,0) [0|65535] "V"  GARMIN
 
 BO_ 2449477665 BMS_STATUS2_MASTER_SLAVE: 8 BMS
- SG_ TempPackN2 : 56|8@1- (1,-40) [-40|215] "°C"  GARMIN
- SG_ TempPackN1 : 48|8@1- (1,-40) [-40|215] "°C"  GARMIN
- SG_ BoardTemp : 40|8@1- (1,-40) [-40|215] "°C"  GARMIN
+ SG_ TempPackN2 : 56|8@1- (1,-40) [-40|215] "ï¿½C"  GARMIN
+ SG_ TempPackN1 : 48|8@1- (1,-40) [-40|215] "ï¿½C"  GARMIN
+ SG_ BoardTemp : 40|8@1- (1,-40) [-40|215] "ï¿½C"  GARMIN
  SG_ IMD : 32|8@1+ (1,0) [0|255] "A"  GARMIN
  SG_ IMR : 16|16@1+ (0.1,0) [0|0] "A"  GARMIN
  SG_ FloatingMode : 11|1@1+ (1,0) [0|0] ""  GARMIN
@@ -703,11 +703,11 @@ BO_ 2566849280 Temp: 8 OBC_MTA
  SG_ PT1000ext2 : 56|8@1+ (1,-40) [-40|215] ""  GARMIN
  SG_ PT1000ext1 : 48|8@1+ (1,-40) [-40|215] ""  GARMIN
  SG_ Temp_uC_SELV : 40|8@1+ (1,-40) [-40|215] ""  GARMIN
- SG_ Temp_uC_LLC : 32|8@1+ (1,-40) [-40|215] "°C"  GARMIN
- SG_ Temp_uC_PFC : 24|8@1+ (1,-40) [-40|215] "°C"  GARMIN
- SG_ TempMosfetSec : 16|8@1+ (1,-40) [-40|215] "°C"  GARMIN
- SG_ TempMosfetPrim : 8|8@1+ (1,-40) [-40|215] "°C"  GARMIN
- SG_ TempMosfetPFC : 0|8@1+ (1,-40) [-40|215] "°C"  GARMIN
+ SG_ Temp_uC_LLC : 32|8@1+ (1,-40) [-40|215] "ï¿½C"  GARMIN
+ SG_ Temp_uC_PFC : 24|8@1+ (1,-40) [-40|215] "ï¿½C"  GARMIN
+ SG_ TempMosfetSec : 16|8@1+ (1,-40) [-40|215] "ï¿½C"  GARMIN
+ SG_ TempMosfetPrim : 8|8@1+ (1,-40) [-40|215] "ï¿½C"  GARMIN
+ SG_ TempMosfetPFC : 0|8@1+ (1,-40) [-40|215] "ï¿½C"  GARMIN
 
 BO_ 2566849536 Internal: 8 OBC_MTA
  SG_ cntHours : 48|16@1+ (1,0) [0|65535] "h"  GARMIN

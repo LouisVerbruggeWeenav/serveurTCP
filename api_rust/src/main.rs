@@ -11,6 +11,8 @@ use std::fs;
 use std::ffi::CString;
 
 use std::sync::Mutex;
+use serde_json::Value;
+use serde::{Serialize, Deserialize};
 
 
 // Ensure the database module is declared
@@ -18,27 +20,110 @@ use std::sync::Mutex;
 mod database;
 use crate::database::{boat::Boat, connection::Connection};
 
-use serde::Deserialize;
 
-// #[derive(Clone)]
+
 struct AppState {
     boat: Mutex<Boat>,
 }
 
 
 #[derive(Deserialize)]
-struct Info {
+struct InfoFrontOne {
     id: i32,
 }
 
+#[derive(Deserialize, Clone)]
+struct InfoFrontByName {
+    name: String
+}
 
 
-#[post("/api/boats/one")]
-async fn get_boat_one(data: web::Data<AppState>, info: web::Json<Info>) -> impl Responder {
+#[get("/")]
+async fn index() -> impl Responder {
+
+    let nom_fichier = "../boats/test/test.json";
+
+    let contenu = fs::read_to_string(nom_fichier).expect("Quelque chose s'est mal passé lors de la lecture du fichier");
+    let json: serde_json::Value = serde_json::from_str(&contenu).expect("msg");
+
+    Json(
+        json
+    )
+}
+
+
+#[get("/boats/grouped")]
+async fn get_grouped_boats(data: web::Data<AppState>) -> impl Responder {
+
+
+    let mut json: serde_json::Value = serde_json::Value::Null;
+    let mut boat = data.boat.lock().unwrap();
+
+    json = match boat.get_grouped_boats() {
+        
+        Ok(groupBoats) => {
+            match serde_json::to_value(&groupBoats) {
+                Ok(val) => val,
+                Err(e) => {
+                    eprintln!("Erreur de sérialisation: {}", e);
+                    serde_json::json!({ "error": format!("Erreur de sérialisation: {}", e) })
+                }
+
+            }
+        }
+
+        Err(e) => {
+            eprintln!("Erreur GroupBy : {}", e);
+            serde_json::json!({ "error": format!("Parsing GroupBy: {}", e) })
+        }
+
+    };
+
+    Json(json)
+
+}
+
+
+#[post("/boats/by-name")]
+async fn get_boat_by_id_post(data: web::Data<AppState>, info: web::Json<InfoFrontByName>) -> impl Responder {
+
+    let mut json: serde_json::Value = serde_json::Value::Null;
+    let mut boat = data.boat.lock().unwrap();
+
+    json = match boat.get_boat_by_name(info.name.clone()) {
+        
+        Ok(groupBoats) => {
+            match serde_json::to_value(&groupBoats) {
+                Ok(val) => val,
+                Err(e) => {
+                    eprintln!("Erreur de sérialisation: {}", e);
+                    serde_json::json!({ "error": format!("Erreur de sérialisation: {}", e) })
+                }
+            }
+        }
+
+        Err(e) => {
+            eprintln!("Erreur SQL byName : {}", e);
+            serde_json::json!({ "error": format!("Parsing GroupBy: {}", e) })
+        }
+
+    };
+
+    Json(json)
+
+
+}
+    
+
+
+
+
+#[post("/boats/one")]
+async fn get_boat_one(data: web::Data<AppState>, info: web::Json<InfoFrontOne>) -> impl Responder {
     
     let mut json: serde_json::Value = serde_json::Value::Null;
 
-    let mut boat = data.boat.lock().unwrap(); // <- maintenant tu peux muter !
+    let mut boat = data.boat.lock().unwrap();
     match boat.get_boat_by_id(info.id) {
         Ok(boats) => {           
 
@@ -72,18 +157,7 @@ async fn get_boat_one(data: web::Data<AppState>, info: web::Json<Info>) -> impl 
 
 
 
-#[get("/")]
-async fn index() -> impl Responder {
 
-    let nom_fichier = "../boats/test/test.json";
-
-    let contenu = fs::read_to_string(nom_fichier).expect("Quelque chose s'est mal passé lors de la lecture du fichier");
-    let json: serde_json::Value = serde_json::from_str(&contenu).expect("msg");
-
-    Json(
-        json
-    )
-}
 
 
 
@@ -98,7 +172,7 @@ async fn index() -> impl Responder {
 
 
 
-fn function_python() -> PyResult<()> {
+fn functionDecryptPython() -> PyResult<()> {
     let code_str = fs::read_to_string("./main.py").expect("Fichier Python introuvable");
 
     let code_cstring = CString::new(code_str).expect("CString::new failed");
@@ -168,10 +242,12 @@ async fn main() -> std::io::Result<()> {
         App::new()
         .app_data(config.clone())
         .service(
-            web::scope("/rust")
+            web::scope("/rust/api")
                 .service(index)
                 //.service(greet)
                 .service(get_boat_one)
+                .service(get_grouped_boats)
+                .service(get_boat_by_id_post)
         )
     })
     .bind(("127.0.0.1", 8080))?

@@ -71,48 +71,50 @@ def raspberryData():
 
 
 # api get all boats grouped by name
-@python_api.route('/api/boats/grouped', methods=['GET'])
-def get_grouped_boats():
-      try:
-            response = boat.get_grouped_boats()
-            return flask.jsonify(response)
-      except Exception as e:
-            return flask.jsonify({"error": str(e)}), 500
+# @python_api.route('/api/boats/grouped', methods=['GET'])
+# def get_grouped_boats():
+#       try:
+#             response = boat.get_grouped_boats()
+#             return flask.jsonify(response)
+#       except Exception as e:
+#             return flask.jsonify({"error": str(e)}), 500
 
 # api select * from boats where name = 'Boat Name'
-@python_api.route('/api/boats/by-name', methods=['POST'])
-def get_boat_by_id_post():
-      try:
-            data = flask.request.get_json()
-            boat_name = data.get('name') if data else None
-            if not boat_name:
-                  return flask.jsonify({"error": "Boat name is required"}), 400
+
+# @python_api.route('/api/boats/by-name', methods=['POST'])
+# def get_boat_by_id_post():
+#       try:
+#             data = flask.request.get_json()
+#             boat_name = data.get('name') if data else None
+#             if not boat_name:
+#                   return flask.jsonify({"error": "Boat name is required"}), 400
             
-            response = boat.get_boat_by_name(boat_name)
-            return flask.jsonify(response)
-      except Exception as e:
-            return flask.jsonify({"error": str(e)}), 500
+#             response = boat.get_boat_by_name(boat_name)
+#             return flask.jsonify(response)
+#       except Exception as e:
+#             return flask.jsonify({"error": str(e)}), 500
+      
 
-@python_api.route('/api/boats/one', methods=['POST'])
-def get_boat_one():
-      try:
-            data = flask.request.get_json()
-            boat_id = data.get('id') if data else None
-            if not boat_id:
-                  return flask.jsonify({"error": "Boat name is required"}), 400
+# @python_api.route('/api/boats/one', methods=['POST'])
+# def get_boat_one():
+#       try:
+#             data = flask.request.get_json()
+#             boat_id = data.get('id') if data else None
+#             if not boat_id:
+#                   return flask.jsonify({"error": "Boat name is required"}), 400
 
-            response = boat.get_boat_by_id(boat_id)
+#             response = boat.get_boat_by_id(boat_id)
 
-            with open(f"./boats/{response[1]}/{response[2]}.json", 'rb') as f:
-                  response = orjson.loads(f.read())  # En mode binaire
+#             with open(f"./boats/{response[1]}/{response[2]}.json", 'rb') as f:
+#                   response = orjson.loads(f.read())  # En mode binaire
 
-            return flask.Response(
-                  orjson.dumps(response),
-                  content_type='application/json'
-            )
+#             return flask.Response(
+#                   orjson.dumps(response),
+#                   content_type='application/json'
+#             )
 
-      except Exception as e:
-            return flask.jsonify({"error": str(e)}), 500
+#       except Exception as e:
+#             return flask.jsonify({"error": str(e)}), 500
 
 # Création de l'app principale
 app = Flask(__name__)

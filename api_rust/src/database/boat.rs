@@ -1,10 +1,12 @@
 
 use std::io;
 
+use actix_web::cookie::time::error;
 use actix_web::Error;
 use mysql::{Pool, PooledConn};
 use mysql::prelude::*;
 use mysql::params;
+use serde::{Serialize};
 
 
 
@@ -15,11 +17,17 @@ pub struct Boat {
 
 
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct BoatCollection  {
     pub id: u32,
     pub name: String,
     pub path: String
+}
+
+#[derive(Debug, Serialize)]
+pub struct BoatCount {
+    name: String,
+    count: u32
 }
 
 
@@ -62,9 +70,36 @@ impl Boat {
         Ok(BoatCollection { id, name, path })
     }
 
-    pub fn getTest(&self) -> &str {
-        let test = "hello CLASS";
-        test
+    pub fn get_grouped_boats(&mut self) -> Result<Vec<BoatCount>, Box<dyn std::error::Error>> {
+
+        let conn = self.conn.as_mut();
+        let conn = conn.ok_or("conn is None")?;
+
+        let groupBoats: Vec<BoatCount> = conn
+            .query_map(
+                "SELECT name, COUNT(name) FROM boats GROUP BY name",
+                |(name, count) | BoatCount {name, count}
+            )?;
+
+        Ok(groupBoats)
     }
 
+    pub fn get_boat_by_name(&mut self, nameBoat: String) -> Result<Vec<BoatCollection>, Box<dyn std::error::Error>> {
+
+        let conn = self.conn.as_mut();
+        let conn = conn.ok_or("conn is None")?;
+
+        // let request = format!("SELECT * FROM boats WHERE name = {};", name);
+
+        let groupBoats: Vec<BoatCollection> = conn
+            .exec_map(
+                "SELECT id, name, path FROM boats WHERE name =:name;",
+                params! ("name" => nameBoat),
+                |(id, name, path) | BoatCollection {id, name, path}
+            )?;
+
+        Ok(groupBoats)
+
+    }
+    
 }

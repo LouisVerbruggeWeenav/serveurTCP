@@ -53,7 +53,7 @@ struct CanFrame {
 
 
 #[post("/raspberrypi/data")]
-async fn raspberryData(data: web::Data<AppState>, info: web::Json<InfoRaspberrypi>) ->  impl Responder {
+async fn raspberryData(info: web::Json<InfoRaspberrypi>) ->  impl Responder {
 
     print!("go to decreypt");
     functionDecryptPython(info.structData.clone());

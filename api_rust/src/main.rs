@@ -62,8 +62,6 @@ async fn raspberryData(info: web::Json<InfoRaspberrypi>) ->  impl Responder {
 }
 
 
-
-
 #[get("/")]
 async fn index() -> impl Responder {
 
